@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { FaEdit, FaWindowClose } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
+
 import axios from '../../services/axios';
 import { Container } from '../../styles/GlobalStyles';
 import { TransactionContainer } from './styled';
@@ -14,7 +15,7 @@ export default function Transactions() {
   useEffect(() => {
     async function getData() {
       setIsLoading(true);
-      const response = await axios.get('/transaction ');
+      const response = await axios.get('/transaction');
       setTransactions(response.data);
       setIsLoading(false);
     }

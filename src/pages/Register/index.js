@@ -1,22 +1,47 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { isEmail } from 'validator';
-import { get } from 'lodash';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { Container } from '../../styles/GlobalStyles';
 import { Form } from './styled';
-import axios from '../../services/axios';
-import history from '../../services/history';
 import Loading from '../../components/Loading';
+import * as actions from '../../store/modules/auth/actions';
 
 export default function Register() {
+  const dispatch = useDispatch();
+
+  const id = useSelector((state) => state.auth.user.id);
+  const nameStored = useSelector((state) => state.auth.user.name);
+  const lastNameStored = useSelector((state) => state.auth.user.lastName);
+  const phoneStored = useSelector((state) => state.auth.user.phone);
+  const birthDateStored = useSelector((state) => state.auth.user.birthDate);
+  const emailStored = useSelector((state) => state.auth.user.email);
+  const isLoading = useSelector((state) => state.auth.isLoading);
+
   const [name, setName] = useState('');
-  const [lastname, setLastname] = useState('');
+  const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (!id) return;
+
+    setName(nameStored);
+    setLastName(lastNameStored);
+    setPhone(phoneStored);
+    setBirthDate(birthDateStored);
+    setEmail(emailStored);
+  }, [
+    nameStored,
+    id,
+    lastNameStored,
+    phoneStored,
+    birthDateStored,
+    emailStored,
+  ]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -26,11 +51,11 @@ export default function Register() {
       formErrors = true;
       toast.error('Nome deve ter entre 3 e 255 caracteres');
     }
-    if (lastname.length < 3 || lastname.length > 255) {
+    if (lastName.length < 3 || lastName.length > 255) {
       formErrors = true;
       toast.error('Sobrenome deve ter entre 3 e 255 caracteres');
     }
-    if (password.length < 8 || password.length > 50) {
+    if (!id && (password.length < 8 || password.length > 50)) {
       formErrors = true;
       toast.error('Senha deve ter entre 8 e 50 caracteres');
     }
@@ -53,33 +78,24 @@ export default function Register() {
 
     if (formErrors) return;
 
-    setIsLoading(true);
-
-    try {
-      await axios.post('/user/', {
-        nome: name,
-        sobrenome: lastname,
-        password,
-        telefone: phone,
-        data_de_nascimento: birthDate,
+    dispatch(
+      actions.registerRequest({
+        name,
+        lastName,
+        id,
         email,
-      });
-      toast.success('Você se cadastrou com sucesso.');
-      setIsLoading(false);
-      history.push('/login');
-    } catch (err) {
-      const errors = get(err, 'response.data.errors', []);
-
-      errors.map((error) => toast.error(error));
-      setIsLoading(false);
-    }
+        phone,
+        birthDate,
+        password,
+      })
+    );
   }
 
   return (
     <Container>
       <Loading isLoading={isLoading} />
 
-      <h1>Crie a sua conta</h1>
+      <h1>{id ? 'Editar dados' : 'Crie a sua conta'}</h1>
 
       <Form onSubmit={handleSubmit}>
         <label htmlFor="name">
@@ -91,12 +107,12 @@ export default function Register() {
             placeholder="Seu Nome"
           />
         </label>
-        <label htmlFor="lastname">
+        <label htmlFor="lastName">
           Sobrenome:
           <input
             type="text"
-            value={lastname}
-            onChange={(e) => setLastname(e.target.value)}
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             placeholder="Seu Sobrenome"
           />
         </label>
@@ -136,7 +152,7 @@ export default function Register() {
             placeholder="Sua senha"
           />
         </label>
-        <button type="submit">Criar minha conta</button>
+        <button type="submit">{id ? 'Salvar' : 'Criar minha conta'}</button>
       </Form>
     </Container>
   );
