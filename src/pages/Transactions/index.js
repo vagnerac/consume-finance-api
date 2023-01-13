@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { get } from 'lodash';
-import { FaEdit, FaWindowClose } from 'react-icons/fa';
+import { FaEdit, FaExclamation, FaWindowClose } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import axios from '../../services/axios';
 import { Container } from '../../styles/GlobalStyles';
@@ -22,6 +23,35 @@ export default function Transactions() {
 
     getData();
   }, []);
+
+  const handleDeleteAsk = (e) => {
+    e.preventDefault();
+    const exclamation = e.currentTarget.nextSibling;
+    exclamation.setAttribute('display', 'block');
+    e.currentTarget.remove();
+  };
+
+  const handleDelete = async (e, id, index) => {
+    e.persist();
+    try {
+      setIsLoading(true);
+      await axios.delete(`/transaction/${id}`);
+      const newTransactions = [...transactions];
+      newTransactions.splice(index, 1);
+      setTransactions(newTransactions);
+      setIsLoading(false);
+    } catch (err) {
+      const status = get(err, 'response.status', 0);
+
+      if (status === 401) {
+        toast.error('Você precisa fazer login para excluir transação');
+      } else {
+        toast.error('Ocorreu um erro ao excluir transação.');
+      }
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Container>
       <Loading isLoading={isLoading} />
@@ -39,7 +69,7 @@ export default function Transactions() {
             </tr>
           </thead>
           <tbody>
-            {transactions.map((transaction) => (
+            {transactions.map((transaction, index) => (
               <tr key={String(transaction.id)}>
                 <td>{transaction.description}</td>
                 <td>{transaction.value}</td>
@@ -59,9 +89,19 @@ export default function Transactions() {
                   </NavLink>
                 </td>
                 <td>
-                  <NavLink to={`/transaction/${transaction.id}/delete`}>
+                  <NavLink
+                    onClick={handleDeleteAsk}
+                    to={`/transaction/${transaction.id}/delete`}
+                  >
                     <FaWindowClose size={16} />
                   </NavLink>
+
+                  <FaExclamation
+                    onClick={(e) => handleDelete(e, transaction.id, index)}
+                    size={16}
+                    display="none"
+                    cursor="pointer"
+                  />
                 </td>
               </tr>
             ))}

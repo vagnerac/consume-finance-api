@@ -1,4 +1,5 @@
 import * as types from '../types';
+import axios from '../../../services/axios';
 
 const initialState = {
   isLoggedIn: false,
@@ -19,6 +20,7 @@ export default function (state = initialState, action) {
     }
     case types.LOGIN_FAILURE: {
       const newState = { ...initialState };
+      delete axios.defaults.headers.Authorization;
       return newState;
     }
 
@@ -50,6 +52,7 @@ export default function (state = initialState, action) {
     }
     case types.LOGOUT_REQUEST: {
       const newState = { ...initialState };
+      delete axios.defaults.headers.Authorization;
       return newState;
     }
 
