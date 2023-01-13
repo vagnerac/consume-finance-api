@@ -45,3 +45,9 @@ export function registerCreatedSuccess(payload) {
     payload,
   };
 }
+export function logoutRequest(payload) {
+  return {
+    type: types.LOGOUT_REQUEST,
+    payload,
+  };
+}

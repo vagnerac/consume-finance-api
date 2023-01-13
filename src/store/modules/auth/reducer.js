@@ -48,6 +48,10 @@ export default function (state = initialState, action) {
       newState.isLoading = false;
       return newState;
     }
+    case types.LOGOUT_REQUEST: {
+      const newState = { ...initialState };
+      return newState;
+    }
 
     default: {
       return state;
