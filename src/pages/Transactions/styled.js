@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { NavLink } from 'react-router-dom';
 
 export const TransactionContainer = styled.div`
   table {
@@ -30,4 +31,9 @@ export const TransactionContainer = styled.div`
       position: relative;
     }
   }
+`;
+
+export const NewTransaction = styled(NavLink)`
+  display: block;
+  padding: 20px 0 10px 0;
 `;

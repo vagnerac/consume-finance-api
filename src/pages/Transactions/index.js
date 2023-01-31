@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 import axios from '../../services/axios';
 import { Container } from '../../styles/GlobalStyles';
-import { TransactionContainer } from './styled';
+import { TransactionContainer, NewTransaction } from './styled';
 import Loading from '../../components/Loading';
 
 export default function Transactions() {
@@ -56,6 +56,8 @@ export default function Transactions() {
     <Container>
       <Loading isLoading={isLoading} />
       <h1>Transactions</h1>
+
+      <NewTransaction to="/transaction">Nova Transação</NewTransaction>
       <TransactionContainer>
         <table>
           <thead>
